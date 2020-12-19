@@ -8,6 +8,9 @@ profIs -> professor's ID
 
 
 
+
+
+
 Student:
 ID
 name
@@ -67,11 +70,11 @@ studentList -> list of all students ->>-
 
 teacherList -> list of all teachers ->>-
 
-ÖğrenciDersKayıt -> which student took which class using a relationship based on < studentID -> classID >
+StdClassReg -> which student took which class using a relationship based on < studentID -> classID >
                     also, every relation has unique ID starting from 1
                     as well as storing info, whether the student took the class or dropped it
                     also the date, they registered to the class
-                    
+
 
 
 
