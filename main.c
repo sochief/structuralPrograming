@@ -1,37 +1,27 @@
 #include <stdio.h>
 #include <string.h>
+#include <dos.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
-typedef struct student
-{
-    int id;
-    char name;
-    char surname;
-    int limit;
-    int numOfClasses;
-};
-typedef struct teacher
-{
-    int id;
-    char name;
-    char surname;
-    char title;
-};
+// add delete change
 
-typedef struct class
+typedef struct relationNode
 {
+    bool status;
+    int date;
     int id;
-    int credits;
-    int capacity;
-    int profId;
+    int stdId;
+    int classId;
+    char regDate[8];
+    struct relationNode *next;
+    struct relationNode *prev;
 };
 
 int main()
 {
-    !TODO
-        // read the txt doc's
-        void
-        addTeacher();        // add node
+    // read the txt doc's
+    void addTeacher();       // add node
     void addStudent();       // add ->>-
     void addSubject();       // add ->>-
     void removeTeacher();    // delete node -> reassign to the previous
@@ -48,3 +38,10 @@ int main()
     void readPrf();          // ->>-
     void readCls();          // ->>-
 }
+
+// !TODO adding a node
+// !TODO deleting a node
+//  !TODO searching a node
+//  !TODO update node
+// !TODO print all nodes
+//  !TODO read from file, create a double linked list
