@@ -35,14 +35,17 @@ void addTeacher(TeacherList *teacherList, int *new_id, char *new_name,
     strcpy(new_teacher->surname, new_surname);
     strcpy(new_teacher->title, new_title);
 
+    new_teacher->next = teacherList->head;
+    new_teacher->prev = NULL;
+
     // make next of next node as prev and prev as null
     if (teacherList->head)
     {
-        teacherList->head->prev->new_teacher;
+        teacherList->head->prev = new_teacher;
     }
     else
     {
-        teacherList->tail = new_teacher
+        teacherList->tail = new_teacher;
     }
     // make new node as a head
     teacherList->head = new_teacher;
@@ -52,14 +55,13 @@ void printTeachers(TeacherNode *teacherNode)
 {
     if (!teacherNode)
         return;
-
     while ((teacherNode->next) != NULL)
     {
         printf("ID:%d NAME:%s SURNAME:%s TITLE:%s \n", teacherNode->id, teacherNode->name, teacherNode->surname, teacherNode->title);
         teacherNode = teacherNode->next;
     }
     // for the last node
-    printf("ID:%d NAME:%s SURNAME:%s LIMIT:%d NUMBER OF CLASSES:%d \n", teacherNode->id, teacherNode->name, teacherNode->surname, teacherNode->title);
+    printf("ID:%d NAME:%s SURNAME:%s TITLE:%s \n", teacherNode->id, teacherNode->name, teacherNode->surname, teacherNode->title);
 }
 
 TeacherNode *searchTeacher(int *id, TeacherList *teacherList)
@@ -84,16 +86,17 @@ void updateTeacher(int *id, TeacherList *teacherList, int choise, char data)
     switch (choise)
     {
         // name
-    case choise == 1:
-        teacherToChange->name = data;
+    case 1:
+        strcpy(teacherToChange->name, data);
         break;
     // surname
-    case choise == 2:
-        teacherToChange->surname = data;
+    case 2:
+        strcpy(teacherToChange->surname, data);
         break;
     // title
-    case choise == 3:
-        teacherToChange->title = data;
+    case 3:
+        strcpy(teacherToChange->title, data);
+        break;
     }
 }
 
@@ -125,4 +128,61 @@ void deleteLast(TeacherList *teacherList)
         teacherList->tail = nodeToDelete->prev;
         teacherList->tail->next = NULL;
     }
+}
+int main()
+{
+    TeacherList *teacherList;
+    char line[100];
+    char element;
+    int i;
+    char *tok, *delim;
+    FILE *fptr;
+
+    teacherList = (TeacherList *)malloc(sizeof(TeacherList));
+    teacherList->head = NULL;
+    teacherList->tail = NULL;
+
+    delim = "/";
+    fptr = fopen("profList.txt", "r");
+    if (fptr == NULL)
+    {
+        printf("Error reading a file.");
+        exit(0);
+    }
+    while (fgets(line, 100, fptr))
+    {
+        tok = strtok(line, delim);
+        int id;
+        int count = 0;
+        char name[20];
+        char surname[20];
+        char title[20];
+        while (tok != NULL)
+        {
+            switch (count)
+            {
+            case 0:
+                id = atoi(tok);
+                count++;
+                break;
+
+            case 1:
+                strcpy(name, tok);
+                count++;
+                break;
+            case 2:
+                strcpy(surname, tok);
+                count++;
+                break;
+            case 3:
+                strcpy(title, tok);
+                count++;
+                break;
+            }
+            tok = strtok(NULL, delim);
+        }
+        addTeacher(teacherList, id, name, surname, title);
+    }
+    printTeachers(teacherList->head);
+    return (0);
 }

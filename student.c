@@ -3,9 +3,7 @@
 #include <dos.h>
 #include <stdlib.h>
 #include <stdbool.h>
-
-// !TODO adding a node
-//  !TODO read from file, create a double linked list
+// !TODO save the data to the same file
 
 typedef struct studentNode
 {
@@ -211,14 +209,5 @@ int main()
         }
         addStudent(studList, id, name, surname, limit, numberOfClasses);
     }
-    fclose(fptr);
-    int testId = 2;
-    char name[20] = "15";
-    int choise = 3;
-    printStudents(studList->head);
-    printf("Updating...\n");
-    updateStudent(testId, studList, choise, name);
-    printf("Finished updateing...\n");
-    printStudents(studList->head);
     return (0);
 }

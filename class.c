@@ -1,4 +1,4 @@
-#include "class.h"
+//#include "class.h"
 #include <stdio.h>
 #include <string.h>
 #include <dos.h>
@@ -32,13 +32,16 @@ void addClass(ClassList *classList, int *new_id, int *new_credits,
     new_class->credits = new_credits;
     new_class->capacity = new_capacity;
     new_class->profId = new_profId;
+
+    new_class->next = classList->head;
+    new_class->prev = NULL;
     if (classList->head)
     {
-        classList->head->prev->new_class;
+        classList->head->prev = new_class;
     }
     else
     {
-        classList->tail = new_class
+        classList->tail = new_class;
     }
     classList->head = new_class;
 }
@@ -77,16 +80,16 @@ void updateClass(int *id, ClassList *classList, int choise, int data)
     classToChange = searchClass(id, classList);
     switch (choise)
     {
-    case choise == 1:
+    case 1:
         classToChange->id = data;
         break;
-    case choise == 2:
+    case 2:
         classToChange->credits = data;
         break;
-    case choise == 3:
+    case 3:
         classToChange->capacity = data;
         break;
-    case choise == 4:
+    case 4:
         classToChange->profId = data;
         break;
     }
@@ -98,8 +101,8 @@ void deleteClass(int *id, ClassList *classList)
     nodeToDelete = searchClass(id, classList);
     if (nodeToDelete)
     {
-        if (ClassList->tail = nodeToDelete)
-            ClassList->tail = nodeToDelete->prev;
+        if (classList->tail = nodeToDelete)
+            classList->tail = nodeToDelete->prev;
 
         if (nodeToDelete->prev)
             nodeToDelete->prev->next = nodeToDelete->next;
