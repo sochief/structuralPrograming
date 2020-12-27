@@ -1,4 +1,4 @@
-
+#include "class.h"
 #include <stdio.h>
 #include <string.h>
 #include <dos.h>
@@ -17,15 +17,14 @@ typedef struct classNode
 
 typedef struct classList
 {
-    struct node *head;
-    struct node *tail;
+    struct classNode *head;
+    struct classNode *tail;
 } ClassList;
 
+// !TODO check if the id is not used, if it is, ask for the other one
 void addClass(ClassList *classList, int *new_id, int *new_credits,
               int *new_capacity, int *new_profId)
 {
-    // basically, we add a new node in the beginning of the double linked list
-    // allocate node
     ClassNode *new_class;
     new_class = (ClassNode *)malloc(sizeof(ClassNode));
 
@@ -54,14 +53,13 @@ void printClass(ClassNode *classNode)
         printf("ID:%d CREDITS:%d CAPACITY:%d PROFFESORS ID:%d \n", classNode->id, classNode->credits, classNode->capacity, classNode->profId);
         classNode = classNode->next;
     }
-    // for the last node
     printf("ID:%d CREDITS:%d CAPACITY:%d PROFFESORS ID:%d \n", classNode->id, classNode->credits, classNode->capacity, classNode->profId);
 }
 
 ClassNode *searchClass(int *id, ClassList *classList)
 {
     ClassNode *current;
-    current = ClassList->head;
+    current = classList->head;
     while (current)
     {
         if (id == current->id)

@@ -1,0 +1,50 @@
+1-In the course registration system,
+    the student must be able to enroll in the opened courses,
+    delete registration and update the registration.
+
+2-The course file must contain the unique course code,
+    name, total credits, quota of each course and the ID number of the lecturer who teaches the course.
+    This file should be able to add, delete and update courses. It will be assumed that only one faculty member teaches a course.
+
+3- The faculty members file should contain the unique ID, Name, Surname and title of each faculty member.
+    This file should be able to add, delete and update a new faculty member.
+
+4-The student file must contain the unique student number, name, surname,
+    total number of courses enrolled and total credit information for each student.
+
+5-While a student can take a large number of courses, a large number of students can take a course, so a file named StudentCourseRegistration
+    must be kept by matching the <studentNO-CourseCode> which student has taken which course. For each pairing, there must be a unique ID
+    that automatically increases starting from 1. In addition, in this matching, the students course enrollment status (REGISTERED or DROPPED)
+    and the course enrollment date should also be kept.
+
+6- Students should be able to add courses according to the maximum number of courses and maximum credit value received
+    from the user while enrolling in the course. When these values ​​are reached, the process of adding courses should be blocked.
+
+
+Coding Requirements:
+    It is forbidden to use static and global variables in your programs.
+    All kinds of memory allocation should be done with dynamic memory management functions.
+    Make appropriate structure definitions for the object in each file detailed above.
+    The files to be created must be in text file format. Design a menu to do the following operations and a function for each action.
+    Use a function pointer to avoid repetition in functions that work with similar logic.
+
+
+1:  Perform the add, delete and update operations for each file in the functions.
+
+2:  Add, delete and update courses for student, course and lecturer.
+
+3:  Write the function that lists the lectures given by the lecturer given an ID.
+
+4:  Write the function that lists all students enrolled in a course for which the course code is given.
+
+5:  Write the function that lists all courses taken by a student given a student number.
+
+6:  Using the code belonging to a course given by an instructor, whose ID is given, write the function that writes the class list of all students
+who take the course to the DERSKODU_CLASSIFTESİ.txt file.
+
+Reporting of the Project:
+In your report, show that the functions you wrote work correctly by entering enough student,
+course and faculty information to test each function you wrote. For this purpose, when you run the program,
+copy everything that appears on the screen and the user enters on the screen from the command line and add it to
+the Word file that will create your report. When the program ends, include the contents of all files in which data
+is stored in your report.

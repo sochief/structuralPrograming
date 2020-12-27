@@ -5,16 +5,8 @@
 #include <stdbool.h>
 
 // !TODO adding a node
-// !TODO deleting a node
-//  !TODO searching a node
-//  !TODO update node
-// !TODO print all nodes
 //  !TODO read from file, create a double linked list
-typedef enum
-{
-    CHAR = char,
-    INT = int,
-} TYPE;
+
 typedef struct studentNode
 {
     int id;
@@ -28,18 +20,11 @@ typedef struct studentNode
 
 typedef struct studList
 {
-    struct node *head;
-    struct node *tail;
+    struct studentNode *head;
+    struct studentNode *tail;
 } StudList;
-void addStudent(StudList *, int *, char *, char *, int *, int *);  // done
-void deleteStudent(StudentNode *nodeToDelete, StudList *studList); // done
-StudentNode *searchStudent(int *id, StudList *studList);           // done
-void updateStudent(StudentNode *nodeToUpdate, StudList *studList);
-void printStudents(StudentNode *);
-void deleteLast(StudList *studList);
 
-void addStudent(StudList *studList, int *new_id, char *new_name,
-                char *new_surname, int *new_limit, int *new_numOfClasses)
+void addStudent(StudList *studList, int *new_id, char *new_name, char *new_surname, int *new_limit, int *new_numOfClasses)
 {
     // basically, we add a new node in the beginning of the double linked list
     // allocate node
@@ -53,14 +38,16 @@ void addStudent(StudList *studList, int *new_id, char *new_name,
     new_student->limit = new_limit;
     new_student->numOfClasses = new_numOfClasses;
 
+    new_student->next = studList->head;
+    new_student->prev = NULL;
     // make next of next node as prev and prev as null
     if (studList->head)
     {
-        studList->head->prev->new_student;
+        studList->head->prev = new_student;
     }
     else
     {
-        studList->tail = new_student
+        studList->tail = new_student;
     }
     // make new node as a head
     studList->head = new_student;
@@ -94,59 +81,41 @@ StudentNode *searchStudent(int *id, StudList *studList)
     }
     return current;
 }
-void updateStudent(int *id, TYPE dataToChange, StudList *studList, int choise)
+void updateStudent(int *id, StudList *studList, int *select, char *dataToChange)
 {
     StudentNode *studentToChange;
     studentToChange = searchStudent(id, studList);
-
+    int choise = select;
     switch (choise)
     {
-        // name
-    case choise == 1:
-        if (TYPE == char)
-        {
-            studentToChange->name = dataToChange;
-            print("Name changed");
-        }
-        else
-        {
-            printf("Wrong data type/ Wrong choise")
-        }
-
+    case 1:
+    {
+        printf("%s\n", dataToChange);
+        strcpy(studentToChange->name, dataToChange);
+        printf("Name changed./n");
         break;
-        // surname
-    case choise == 2:
-        if (TYPE == char)
-        {
-            studentToChange->surname = dataToChange;
-        }
-        else
-        {
-            printf("Wrong data type/ Wrong choise")
-        }
+    }
+    case 2:
+    {
+        strcpy(studentToChange->surname, dataToChange);
+        printf("Surname changed.");
         break;
-        // limit
-    case choise == 3:
-        if (TYPE == int)
-        {
-            studentToChange->limit = dataToChange
-        }
-        else
-        {
-            printf("Wrong data type/ Wrong choise")
-        }
+    }
+    case 3:
+    {
+        // make it int
+        dataToChange = atoi(dataToChange);
+        studentToChange->limit = dataToChange;
+        printf("Students limit changed.");
         break;
-        // numberOfclasses
-    case choise == 4:
-        if (TYPE == int)
-        {
-            studentToChange->numOfClasses = dataToChange;
-        }
-        else
-        {
-            printf("Wrong data type/ Wrong choise")
-        }
+    }
+    case 4:
+    {
+        dataToChange = atoi(dataToChange);
+        studentToChange->numOfClasses = dataToChange;
+        printf("Number of classes changed.");
         break;
+    }
     }
 }
 void deleteStudent(int *id, StudList *studList)
@@ -175,5 +144,81 @@ void deleteLast(StudList *studList)
         nodeToDelete = studList->tail;
         studList->tail = nodeToDelete->prev;
         studList->tail->next = NULL;
+        if (nodeToDelete)
+            free(nodeToDelete);
     }
+}
+
+int main()
+{
+    StudList *studList;
+    char line[100];
+    char element;
+    int i;
+    char *tok, *delim;
+    FILE *fptr;
+
+    studList = (StudList *)malloc(sizeof(StudList));
+    studList->head = NULL;
+    studList->tail = NULL;
+
+    delim = "/";
+    printf("Entering a programm.\n");
+    fptr = fopen("stdList.txt", "r");
+    if (fptr == NULL)
+    {
+        printf("Error reading a file.");
+        exit(0);
+    }
+    while (fgets(line, 100, fptr))
+    {
+        tok = strtok(line, delim);
+        int id;
+        int count = 0;
+        char name[20];
+        char surname[20];
+        int limit;
+        int numberOfClasses;
+        while (tok != NULL)
+        {
+            switch (count)
+            {
+            case 0:
+                id = atoi(tok);
+                count++;
+                break;
+
+            case 1:
+                strcpy(name, tok);
+                count++;
+                break;
+            case 2:
+                strcpy(surname, tok);
+                count++;
+                break;
+            case 3:
+                limit = atoi(tok);
+                count++;
+                break;
+            case 4:
+                numberOfClasses = atoi(tok);
+                count++;
+                break;
+            default:
+                break;
+            }
+            tok = strtok(NULL, delim);
+        }
+        addStudent(studList, id, name, surname, limit, numberOfClasses);
+    }
+    fclose(fptr);
+    int testId = 2;
+    char name[20] = "15";
+    int choise = 3;
+    printStudents(studList->head);
+    printf("Updating...\n");
+    updateStudent(testId, studList, choise, name);
+    printf("Finished updateing...\n");
+    printStudents(studList->head);
+    return (0);
 }

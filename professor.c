@@ -4,11 +4,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-// !TODO adding a node
-// !TODO deleting a node
-//  !TODO searching a node
-//  !TODO update node
-// !TODO print all nodes
+// !TODO search by a class id
 
 typedef struct teacherNode
 {
@@ -21,8 +17,8 @@ typedef struct teacherNode
 } TeacherNode;
 typedef struct teacherList
 {
-    struct node *head;
-    struct node *tail;
+    struct teacherNode *head;
+    struct teacherNode *tail;
 } TeacherList;
 
 void addTeacher(TeacherList *teacherList, int *new_id, char *new_name,
