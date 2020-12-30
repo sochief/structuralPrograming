@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <string.h>
-#include <dos.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <time.h>
+#include <assert.h>
 // student
 
 typedef struct studentNode
@@ -74,6 +75,8 @@ StudentNode *searchStudent(int *id, StudList *studList);
 void updateStudent(int *id, StudList *studList, int *select, char *dataToChange);
 void deleteStudent(int *id, StudList *studList);
 void deleteLastStudent(StudList *studList);
+void loadStudent();
+
 void addTeacher(TeacherList *teacherList, int *new_id, char *new_name, char *new_surname, char *new_title);
 void printTeachers(TeacherNode *teacherNode);
 void printSingleTeacher(TeacherNode *teacherNode);
@@ -81,6 +84,8 @@ TeacherNode *searchTeacher(int *id, TeacherList *teacherList);
 void updateTeacher(int *id, TeacherList *teacherList, int choise, char data);
 void deleteTeacher(int *id, TeacherList *teacherList);
 void deleteLastTeacher(TeacherList *teacherList);
+void loadTeachers();
+
 void addClass(ClassList *classList, int *new_id, int *new_credits, int *new_capacity, int *new_profId);
 void printClasses(ClassNode *classNode);
 void printSingleClass(ClassNode *classNode);
@@ -94,29 +99,50 @@ void updateRelationStatus(RelationList *relationList, int *id);
 void printRelations(RelationNode *relationNode);
 void printSingleRelation(RelationNode *relationNode);
 
-void(*addFunct[4]) = {addStudent, addTeacher, addClass, addRelation};
-void(*deleteFunct[3]) = {deleteStudent, deleteTeacher, deleteClass};
-void(*updateFunct[4]) = {updateClass, updateStudent, updateTeacher, updateRelationStatus};
-void(*printSingle[4]) = {printSingleClass, printSingleStudent, printSingleTeacher, printSingleRelation};
-void(*printAll[4]) = {printStudents, printTeachers, printClasses, printRelations};
+void (*addFunct[4])() = {addStudent, addTeacher, addClass, addRelation};
+void (*deleteFunct[3])() = {deleteStudent, deleteTeacher, deleteClass};
+void (*updateFunct[4])() = {updateClass, updateStudent, updateTeacher, updateRelationStatus};
+void (*printSingle[4])() = {printSingleClass, printSingleStudent, printSingleTeacher, printSingleRelation};
+void (*printAll[4])() = {printStudents, printTeachers, printClasses, printRelations};
 
 int main()
 {
     // !TODO function to dump the data
     //  !TODO create a main flow
     StudList *studList;
+    studList = (StudList *)malloc(sizeof(StudList));
+    studList->head = NULL;
+    studList->tail = NULL;
+
+    TeacherList *teacherList;
+    teacherList = (TeacherList *)malloc(sizeof(TeacherList));
+    teacherList->head = NULL;
+    teacherList->tail = NULL;
+
+    ClassList *classList;
+    classList = (ClassList *)malloc(sizeof(ClassList));
+    classList->head = NULL;
+    classList->tail = NULL;
+
+    loadStudent(studList);
+    loadTeachers(teacherList);
+    loadClasses(classList);
+    (*printAll[0])(studList->head);
+    (*printAll[1])(teacherList->head);
+    (printAll[2])(classList->head);
+    return (0);
+}
+void loadStudent(StudList *studList)
+{
     char line[100];
     char element;
     int i;
     char *tok, *delim;
     FILE *fptr;
 
-    studList = (StudList *)malloc(sizeof(StudList));
-    studList->head = NULL;
-    studList->tail = NULL;
-
     delim = "/";
-    printf("Entering a programm.\n");
+    printf("Reading students.\n");
+
     fptr = fopen("./data/stdList.txt", "r");
     if (fptr == NULL)
     {
@@ -162,10 +188,117 @@ int main()
             }
             tok = strtok(NULL, delim);
         }
-        addStudent(studList, id, name, surname, limit, numberOfClasses);
+        (*addFunct[0])(studList, id, name, surname, limit, numberOfClasses);
+        //addStudent(studList, id, name, surname, limit, numberOfClasses);
     }
-    printStudents(studList->head);
-    return (0);
+}
+void loadTeachers(TeacherList *teacherList)
+{
+    char line[100];
+    char element;
+    int i;
+    char *tok, *delim;
+    FILE *fptr;
+
+    delim = "/";
+    printf("Reading teacher.\n");
+
+    fptr = fopen("./data/profList.txt", "r");
+    if (fptr == NULL)
+    {
+        printf("Error reading a file.");
+        exit(0);
+    }
+    while (fgets(line, 100, fptr))
+    {
+        tok = strtok(line, delim);
+        int id;
+        int count = 0;
+        char name[20];
+        char surname[20];
+        char title[20];
+        while (tok != NULL)
+        {
+            switch (count)
+            {
+            case 0:
+                id = atoi(tok);
+                count++;
+                break;
+
+            case 1:
+                strcpy(name, tok);
+                count++;
+                break;
+            case 2:
+                strcpy(surname, tok);
+                count++;
+                break;
+            case 3:
+                strcpy(title, tok);
+                count++;
+                break;
+            default:
+                break;
+            }
+            tok = strtok(NULL, delim);
+        }
+        (*addFunct[1])(teacherList, id, name, surname, title);
+    }
+}
+void loadClasses(ClassList *classList)
+{
+    char line[100];
+    char element;
+    int i;
+    char *tok, *delim;
+    FILE *fptr;
+
+    delim = "/";
+    printf("Reading classes.\n");
+
+    fptr = fopen("./data/classList.txt", "r");
+    if (fptr == NULL)
+    {
+        printf("Error reading a file.");
+        exit(0);
+    }
+    while (fgets(line, 100, fptr))
+    {
+        tok = strtok(line, delim);
+        int id;
+        int count = 0;
+        int credits;
+        int capacity;
+        int profId;
+        while (tok != NULL)
+        {
+            switch (count)
+            {
+            case 0:
+                id = atoi(tok);
+                count++;
+                break;
+
+            case 1:
+                credits = atoi(tok);
+                count++;
+                break;
+            case 2:
+                capacity = atoi(tok);
+                count++;
+                break;
+            case 3:
+                profId = atoi(tok);
+                count++;
+                break;
+            default:
+                break;
+            }
+            tok = strtok(NULL, delim);
+        }
+        (*addFunct[2])(classList, id, credits, capacity, profId);
+    }
 }
 void addStudent(StudList *studList, int *new_id, char *new_name, char *new_surname, int *new_limit, int *new_numOfClasses)
 {

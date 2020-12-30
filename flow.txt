@@ -1,5 +1,5 @@
 Start
-1) Load all of documents(name of txts are predefined)
+1) Load all of documents(name of txts are predefined) !DONE
 
 Print menu
     1)Add an object.
