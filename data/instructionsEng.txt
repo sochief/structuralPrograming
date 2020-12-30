@@ -29,9 +29,9 @@ Coding Requirements:
     Use a function pointer to avoid repetition in functions that work with similar logic.
 
 
-1:  Perform the add, delete and update operations for each file in the functions.
+1:  Perform the add, delete and update operations for each file in the functions.(EZ)
 
-2:  Add, delete and update courses for student, course and lecturer.
+2:  Add, delete and update courses for student, course and lecturer.(EZ)
 
 3:  Write the function that lists the lectures given by the lecturer given an ID.
 

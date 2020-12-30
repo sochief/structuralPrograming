@@ -1,0 +1,26 @@
+Start
+1) Load all of documents(name of txts are predefined)
+
+Print menu
+    1)Add an object.
+        a)ask for a Data
+        b)check by id if the user exists
+            b1)if exists
+                b1a)change id or quit?
+
+    2)update object data
+        switch(what to change, data,id)
+        id,choise,data -> updateFunction -> seacrhFunction -> check the data
+
+    3)deleteObject
+    
+    4)regist student
+        a)regist
+            1)checks credist and limit of classes
+            if yes we add a realtion
+        b)change status
+            1)check ->>-
+            2)update relation
+    5)print lectures(teacherId -> classList)
+        go through all classes if teacherId == classNode -> profId
+        print node
