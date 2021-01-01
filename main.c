@@ -230,16 +230,20 @@ int main()
             case 1:
                 printf("Enter id of a student to remove");
                 scanf("%d", &data);
-                deleteStudent(data, studList);
-                printStudents(studList->head);
+                (*deleteFunct[0])(data, studList);
+                (*printAll[0])(studList->head);
                 break;
             case 2:
                 printf("Enter id of a teacher to remove");
-                scanf("%c", &data);
+                scanf("%d", &data);
+                (*deleteFunct[1])(data, teacherList);
+                (*printAll[1])(teacherList->head);
                 break;
             case 3:
                 printf("Enter id of a class to remove");
-                scanf("%c", &data);
+                scanf("%d", &data);
+                (*deleteFunct[2])(data, classList);
+                (*printAll[2])(classList->head);
                 break;
 
             default:
