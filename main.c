@@ -101,8 +101,8 @@ void printSingleRelation(RelationNode *relationNode);
 
 void (*addFunct[4])() = {addStudent, addTeacher, addClass, addRelation};
 void (*deleteFunct[3])() = {deleteStudent, deleteTeacher, deleteClass};
-void (*updateFunct[4])() = {updateClass, updateStudent, updateTeacher, updateRelationStatus};
-void (*printSingle[4])() = {printSingleClass, printSingleStudent, printSingleTeacher, printSingleRelation};
+void (*updateFunct[4])() = {updateStudent, updateTeacher, updateClass, updateRelationStatus};
+void (*printSingle[4])() = {printSingleStudent, printSingleTeacher, printSingleClass, printSingleRelation};
 void (*printAll[4])() = {printStudents, printTeachers, printClasses, printRelations};
 
 int main()
@@ -134,13 +134,9 @@ int main()
     printf("---------------Welcome to the system---------------");
     while (exit != 1)
     {
-        int select;
-        int subselect;
-        int data;
         int iter = 0;
-        // data
-        int id, limit, numOfClasses, credits, capacity, profId;
-        char name[20], surname[20], title[20];
+        int id, limit, numOfClasses, credits, capacity, profId, select, subselect, subSubSelect, choice, data;
+        char name[20], surname[20], title[20], info[20];
 
         printMenu();
         scanf("%d", &select);
@@ -159,12 +155,12 @@ int main()
                     {
                     case 0:
                         printf("Enter a name:\n");
-                        scanf("%s", &name);
+                        gets(name);
                         iter++;
                         break;
                     case 1:
                         printf("Print surname:\n");
-                        scanf("%s", &surname);
+                        gets(surname);
                         iter++;
                         break;
                     case 2:
@@ -204,12 +200,42 @@ int main()
             }
             break;
         case 2:
-            printf("Update:\n1)Student,\n2)Teacher\n3)Class");
-            scanf("%d", subselect);
+            printf("\n\n\nUpdate:\n1)Student\n2)Teacher\n3)Class\n");
+            subselect = getchar();
             switch (subselect)
             {
             case 1:
-                printf("Updating a student");
+                printf("\nEnter student's ID:\n");
+                id = getchar();
+                printf("\nUpdating a student\nData to change:\n1)Name\n2)Surname\n3)Number of credits\n4)Maximum number of courses\n");
+                subSubSelect = getchar();
+
+                switch (subSubSelect)
+                {
+                case 1:
+                    printf("\nEnter a Name:\n");
+                    scanf("%s", info);
+                    (*updateFunct[0])(id, studList, 1, info);
+                    break;
+                case 2:
+                    printf("\nEnter a Surname:\n");
+                    scanf("%s", info);
+                    (*updateFunct[0])(id, studList, 2, info);
+                    break;
+                case 3:
+                    printf("\nEnter a Number of Credits:\n");
+                    info = getchar();
+                    scanf("%s", info) (*updateFunct[0])(id, studList, 3, info);
+                    break;
+                case 4:
+                    printf("\nEnter a Maximum Number of Courses:\n");
+                    scanf("%s", info) (*updateFunct[0])(id, studList, 4, info);
+                    break;
+
+                default:
+                    printf("\nWrong input.\n");
+                    break;
+                }
                 break;
             case 2:
                 printf("Updating a teacher");
@@ -221,33 +247,33 @@ int main()
             default:
                 break;
             }
+            break;
         case 3:
-            printf("Remove:\n1)Student\n2)Teacher\n3)Class");
-            scanf("%d", &subselect);
-            // !TODO add functions
+            printf("\n\n\nRemove:\n1)Student\n2)Teacher\n3)Class\n");
+            subselect = getchar();
             switch (subselect)
             {
             case 1:
-                printf("Enter id of a student to remove");
+                printf("Enter id of a student to remove:\n");
                 scanf("%d", &data);
                 (*deleteFunct[0])(data, studList);
                 (*printAll[0])(studList->head);
                 break;
             case 2:
-                printf("Enter id of a teacher to remove");
+                printf("Enter id of a teacher to remove:\n");
                 scanf("%d", &data);
                 (*deleteFunct[1])(data, teacherList);
                 (*printAll[1])(teacherList->head);
                 break;
             case 3:
-                printf("Enter id of a class to remove");
+                printf("Enter id of a class to remove:\n");
                 scanf("%d", &data);
                 (*deleteFunct[2])(data, classList);
                 (*printAll[2])(classList->head);
                 break;
 
             default:
-                printf("Wrong input.");
+                printf("\nWrong input.\n");
                 break;
             }
             break;
@@ -257,7 +283,7 @@ int main()
             printf("Register for the class.\nPrint your Student id as well as Class Id");
             break;
         case 5:
-            printf("List all the classes chosen bye a student.\nPlease provide student id:\n");
+            printf("List all the classes chosen by a student.\nPlease provide student id:\n");
             break;
         case 6:
             printf("To save all student, who took the class, please provide the Id of the class.\n");
@@ -502,19 +528,24 @@ StudentNode *searchStudent(int *id, StudList *studList)
     }
     return current;
 }
-void updateStudent(int *id, StudList *studList, int *select, char *dataToChange)
+void updateStudent(int *id, StudList *studList, int *choice, char *dataToChange)
 {
     // !TODO wrong choise for all updates
     StudentNode *studentToChange;
     studentToChange = searchStudent(id, studList);
-    int choise = select;
+    if (studentToChange == NULL)
+    {
+        printf("Student not found");
+        return NULL;
+    }
+    int choise = choice;
     switch (choise)
     {
     case 1:
     {
         printf("%s\n", dataToChange);
         strcpy(studentToChange->name, dataToChange);
-        printf("Name changed./n");
+        printf("Name changed.\n");
         break;
     }
     case 2:
