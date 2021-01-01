@@ -130,8 +130,147 @@ int main()
     (*printAll[0])(studList->head);
     (*printAll[1])(teacherList->head);
     (printAll[2])(classList->head);
+    int exit = 0;
+    printf("---------------Welcome to the system---------------");
+    while (exit != 1)
+    {
+        int select;
+        int subselect;
+        int data;
+        int iter = 0;
+        // data
+        int id, limit, numOfClasses, credits, capacity, profId;
+        char name[20], surname[20], title[20];
+
+        printMenu();
+        scanf("%d", &select);
+        switch (select)
+        {
+        case 1:
+            printf("Add:\n1)Student\n2)Teacher\n3)Class\n");
+            scanf("%d", &subselect);
+            switch (subselect)
+            {
+            case 1:
+                printf("Adding a student");
+                while (iter < 5)
+                {
+                    switch (iter)
+                    {
+                    case 0:
+                        printf("Enter a name:\n");
+                        scanf("%s", &name);
+                        iter++;
+                        break;
+                    case 1:
+                        printf("Print surname:\n");
+                        scanf("%s", &surname);
+                        iter++;
+                        break;
+                    case 2:
+                        printf("Enter id:\n");
+                        scanf("%d", &id);
+                        while (searchStudent(id, studList) != NULL)
+                        {
+                            printf("Student with this id exist, enter anothe id:\n");
+                            scanf("%d", &id);
+                        }
+                        iter++;
+                        break;
+                    case 3:
+                        printf("Enter number of credits:\n");
+                        scanf("%d", &limit);
+                        iter++;
+                        break;
+                    case 4:
+                        printf("Enter number of classes:\n");
+                        scanf("%d", &numOfClasses);
+                        iter++;
+                        break;
+                    }
+                }
+                (*addFunct[0])(studList, name, surname, id, limit, numOfClasses);
+                printStudents(studList->head);
+                break;
+            case 2:
+                printf("Adding a teacher");
+                break;
+            case 3:
+                printf("Adding a class");
+                break;
+            default:
+                printf("Wrong input");
+                break;
+            }
+            break;
+        case 2:
+            printf("Update:\n1)Student,\n2)Teacher\n3)Class");
+            scanf("%d", subselect);
+            switch (subselect)
+            {
+            case 1:
+                printf("Updating a student");
+                break;
+            case 2:
+                printf("Updating a teacher");
+                break;
+            case 3:
+                printf("Updating a class");
+                break;
+
+            default:
+                break;
+            }
+        case 3:
+            printf("Remove:\n1)Student\n2)Teacher\n3)Class");
+            scanf("%d", &subselect);
+            // !TODO add functions
+            switch (subselect)
+            {
+            case 1:
+                printf("Enter id of a student to remove");
+                scanf("%d", &data);
+                deleteStudent(data, studList);
+                printStudents(studList->head);
+                break;
+            case 2:
+                printf("Enter id of a teacher to remove");
+                scanf("%c", &data);
+                break;
+            case 3:
+                printf("Enter id of a class to remove");
+                scanf("%c", &data);
+                break;
+
+            default:
+                printf("Wrong input.");
+                break;
+            }
+            break;
+
+            break;
+        case 4:
+            printf("Register for the class.\nPrint your Student id as well as Class Id");
+            break;
+        case 5:
+            printf("List all the classes chosen bye a student.\nPlease provide student id:\n");
+            break;
+        case 6:
+            printf("To save all student, who took the class, please provide the Id of the class.\n");
+            break;
+        default:
+            printf("Wrong input.");
+            break;
+        }
+    }
+
     return (0);
 }
+void printMenu()
+{
+    printf("Choose your operation:\n1)Add student/teacher/class\n2)Update student/teacher/class\n3)Delete student/teacher/class\n4)Register/Cancel for a class\n5)Print all courses taken by student\n6)Load to the txt all student, who took certain class\n");
+}
+
 void loadStudent(StudList *studList)
 {
     char line[100];
