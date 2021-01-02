@@ -5,7 +5,8 @@
 #include <time.h>
 #include <assert.h>
 // student
-
+// !TODO fix delete function variable types
+// !TODO Cases 4,5,6 list dumping for all the data
 typedef struct studentNode
 {
     int id;
@@ -41,6 +42,7 @@ typedef struct classNode
     int credits;
     int capacity;
     int profId;
+    char name[20];
     struct classNode *next;
     struct classNode *prev;
 } ClassNode;
@@ -68,29 +70,29 @@ typedef struct relationList
     struct relationNode *tail;
 } RelationList;
 // Function Declaration
-void addStudent(StudList *studList, int *new_id, char *new_name, char *new_surname, int *new_limit, int *new_numOfClasses);
+void addStudent(StudList *studList, char *char_id, char *new_name, char *new_surname, char *char_limit, char *char_numOfClasses);
 void printStudents(StudentNode *studentNode);
 void printSingleStudent(StudentNode *studentNode);
 StudentNode *searchStudent(int *id, StudList *studList);
-void updateStudent(int *id, StudList *studList, int *select, char *dataToChange);
+void updateStudent(char *id, StudList *studList, char *select, char *dataToChange);
 void deleteStudent(int *id, StudList *studList);
 void deleteLastStudent(StudList *studList);
 void loadStudent();
 
-void addTeacher(TeacherList *teacherList, int *new_id, char *new_name, char *new_surname, char *new_title);
+void addTeacher(TeacherList *teacherList, char *new_id, char *new_name, char *new_surname, char *new_title);
 void printTeachers(TeacherNode *teacherNode);
 void printSingleTeacher(TeacherNode *teacherNode);
 TeacherNode *searchTeacher(int *id, TeacherList *teacherList);
-void updateTeacher(int *id, TeacherList *teacherList, int choise, char data);
+void updateTeacher(char *char_id, TeacherList *teacherList, char *char_choise, char *data);
 void deleteTeacher(int *id, TeacherList *teacherList);
 void deleteLastTeacher(TeacherList *teacherList);
 void loadTeachers();
 
-void addClass(ClassList *classList, int *new_id, int *new_credits, int *new_capacity, int *new_profId);
+void addClass(ClassList *classList, char *char_id, char *char_credits, char *char_capacity, char *char_profId, char *name);
 void printClasses(ClassNode *classNode);
 void printSingleClass(ClassNode *classNode);
 ClassNode *searchClass(int *id, ClassList *classList);
-void updateClass(int *id, ClassList *classList, int choise, int data);
+void updateClass(char *char_id, ClassList *classList, char *char_choise, char *char_data);
 void deleteClass(int *id, ClassList *classList);
 void deleteLastClass(ClassList *classList);
 void addRelation(RelationList *relationList, int *new_studentId, int *new_classId, char *new_registDate, char *status);
@@ -135,8 +137,8 @@ int main()
     while (exit != 1)
     {
         int iter = 0;
-        int id, limit, numOfClasses, credits, capacity, profId, select, subselect, subSubSelect, choice, data;
-        char name[20], surname[20], title[20], info[20];
+        int select, subselect, subSubs, choice, data, new_id, new_prof_id;
+        char name[20], surname[20], title[20], info[20], empty, id[10], limit[10], numOfClasses[10], credits[10], capacity[20], subSubSelect[10], sub, prof_id[20];
 
         printMenu();
         scanf("%d", &select);
@@ -145,112 +147,219 @@ int main()
         case 1:
             printf("Add:\n1)Student\n2)Teacher\n3)Class\n");
             scanf("%d", &subselect);
+            scanf("%c", &empty);
             switch (subselect)
             {
             case 1:
                 printf("Adding a student");
-                while (iter < 5)
+                printf("Enter a name:\n");
+                gets(name);
+                printf("Print surname:\n");
+                gets(surname);
+                printf("Enter id:\n");
+                gets(id);
+                new_id = atoi(id);
+                while (searchStudent(new_id, studList) != NULL)
                 {
-                    switch (iter)
-                    {
-                    case 0:
-                        printf("Enter a name:\n");
-                        gets(name);
-                        iter++;
-                        break;
-                    case 1:
-                        printf("Print surname:\n");
-                        gets(surname);
-                        iter++;
-                        break;
-                    case 2:
-                        printf("Enter id:\n");
-                        scanf("%d", &id);
-                        while (searchStudent(id, studList) != NULL)
-                        {
-                            printf("Student with this id exist, enter anothe id:\n");
-                            scanf("%d", &id);
-                        }
-                        iter++;
-                        break;
-                    case 3:
-                        printf("Enter number of credits:\n");
-                        scanf("%d", &limit);
-                        iter++;
-                        break;
-                    case 4:
-                        printf("Enter number of classes:\n");
-                        scanf("%d", &numOfClasses);
-                        iter++;
-                        break;
-                    }
+                    printf("Student with this id exist, enter anothe id:\n");
+                    gets(id);
+                    new_id = atoi(id);
                 }
-                (*addFunct[0])(studList, name, surname, id, limit, numOfClasses);
+                printf("Enter number of credits:\n");
+                gets(limit);
+                printf("Enter number of classes:\n");
+                gets(numOfClasses);
+                (*addFunct[0])(studList, id, name, surname, limit, numOfClasses);
                 printStudents(studList->head);
                 break;
             case 2:
                 printf("Adding a teacher");
+                printf("Enter a name:\n");
+                gets(name);
+                printf("Print surname:\n");
+                gets(surname);
+                printf("Enter id:\n");
+                gets(id);
+                new_id = atoi(id);
+                while (searchTeacher(new_id, teacherList) != NULL)
+                {
+                    printf("Teacher with this id exist, enter another id:\n");
+                    gets(id);
+                    new_id = atoi(id);
+                }
+                printf("Enter title:\n");
+                gets(title);
+                (*addFunct[1])(teacherList, id, name, surname, title);
+                printTeachers(teacherList->head);
                 break;
             case 3:
                 printf("Adding a class");
+                printf("Enter credits:\n");
+                gets(credits);
+                printf("Print capacity:\n");
+                gets(capacity);
+                printf("Enter id:\n");
+                gets(id);
+                new_id = atoi(id);
+                while (searchClass(new_id, classList) != NULL)
+                {
+                    printf("Class with this id exist, enter another id:\n");
+                    gets(id);
+                    new_id = atoi(id);
+                }
+
+                // CHECK
+                printf("Enter professor's id:\n");
+                gets(prof_id);
+                new_id = atoi(prof_id);
+                while (searchTeacher(new_id, teacherList) == NULL)
+                {
+                    printf("Teacher with this doesn't, enter another id:\n");
+                    gets(id);
+                    new_id = atoi(id);
+                }
+                printf("Enter name:\n");
+                gets(name);
+                (*addFunct[2])(classList, id, credits, capacity, prof_id, name);
+                printClasses(classList->head);
                 break;
             default:
                 printf("Wrong input");
                 break;
             }
             break;
+
         case 2:
             printf("\n\n\nUpdate:\n1)Student\n2)Teacher\n3)Class\n");
-            subselect = getchar();
+            scanf("%d", &subselect);
+            scanf("%c", &sub);
             switch (subselect)
             {
             case 1:
                 printf("\nEnter student's ID:\n");
-                id = getchar();
-                printf("\nUpdating a student\nData to change:\n1)Name\n2)Surname\n3)Number of credits\n4)Maximum number of courses\n");
-                subSubSelect = getchar();
-
-                switch (subSubSelect)
+                gets(id);
+                new_id = atoi(id);
+                while (searchStudent(new_id, studList) == NULL)
+                {
+                    printf("Student with this id doesn't exist, enter another id:\n");
+                    gets(id);
+                    new_id = atoi(id);
+                }
+                printf("\nUpdating a student\nData to change:\n1)Name\n2)Surname\n");
+                gets(subSubSelect);
+                subSubs = atoi(subSubSelect);
+                switch (subSubs)
                 {
                 case 1:
                     printf("\nEnter a Name:\n");
-                    scanf("%s", info);
-                    (*updateFunct[0])(id, studList, 1, info);
+                    gets(info);
+                    (*updateFunct[0])(id, studList, subSubSelect, info);
                     break;
                 case 2:
                     printf("\nEnter a Surname:\n");
-                    scanf("%s", info);
-                    (*updateFunct[0])(id, studList, 2, info);
+                    gets(info);
+                    (*updateFunct[0])(id, studList, subSubSelect, info);
                     break;
-                case 3:
-                    printf("\nEnter a Number of Credits:\n");
-                    info = getchar();
-                    scanf("%s", info) (*updateFunct[0])(id, studList, 3, info);
-                    break;
-                case 4:
-                    printf("\nEnter a Maximum Number of Courses:\n");
-                    scanf("%s", info) (*updateFunct[0])(id, studList, 4, info);
-                    break;
-
                 default:
                     printf("\nWrong input.\n");
                     break;
                 }
+                printStudents(studList->head);
                 break;
             case 2:
-                printf("Updating a teacher");
+                printf("Updating a professor");
+                printf("\nEnter professors's ID:\n");
+                gets(id);
+                new_id = atoi(id);
+                while (searchTeacher(new_id, teacherList) == NULL)
+                {
+                    printf("Professor with this id doesn't exist, enter another id:\n");
+                    gets(id);
+                    new_id = atoi(id);
+                }
+                printf("\nUpdating a professor\nData to change:\n1)Name\n2)Surname\n3)Title\n");
+                gets(subSubSelect);
+                subSubs = atoi(subSubSelect);
+                switch (subSubs)
+                {
+                case 1:
+                    printf("\nEnter a Name:\n");
+                    gets(info);
+                    (*updateFunct[1])(id, teacherList, subSubSelect, info);
+                    break;
+                case 2:
+                    printf("\nEnter a Surname:\n");
+                    gets(info);
+                    (*updateFunct[1])(id, teacherList, subSubSelect, info);
+                    break;
+                case 3:
+                    printf("\nEnter a title:\n");
+                    gets(info);
+                    (*updateFunct[1])(id, teacherList, subSubSelect, info);
+                    break;
+                default:
+                    printf("\nWrong input.\n");
+                    break;
+                }
+                printTeachers(teacherList->head);
                 break;
             case 3:
                 printf("Updating a class");
+                printf("\nEnter class ID:\n");
+                gets(id);
+                new_id = atoi(id);
+                while (searchClass(new_id, classList) == NULL)
+                {
+                    printf("Class with this id doesn't exist, enter another id:\n");
+                    gets(id);
+                    new_id = atoi(id);
+                }
+                printf("\nUpdating a class\nData to change:\n1)Credits\n2)Capacity\n3)Professor's ID\n4)Name\n");
+                gets(subSubSelect);
+                subSubs = atoi(subSubSelect);
+                switch (subSubs)
+                {
+                case 1:
+                    printf("\nEnter credits:\n");
+                    gets(info);
+                    (*updateFunct[2])(id, classList, subSubSelect, info);
+                    break;
+                case 2:
+                    printf("\nEnter capacity:\n");
+                    gets(info);
+                    (*updateFunct[2])(id, classList, subSubSelect, info);
+                    break;
+                case 3:
+                    printf("\nEnter a Professors's ID:\n");
+                    gets(prof_id);
+                    new_prof_id = atoi(prof_id);
+                    while (searchTeacher(new_prof_id, teacherList) == NULL)
+                    {
+                        printf("Professor with this id doesn't exist, enter another id:\n");
+                        gets(prof_id);
+                        new_prof_id = atoi(prof_id);
+                    }
+                    (*updateFunct[2])(id, classList, subSubSelect, prof_id);
+                    break;
+                case 4:
+                    printf("Enter a name:\n");
+                    gets(info);
+                    (*updateFunct[2])(id, classList, subSubSelect, info);
+                    break;
+                default:
+                    printf("\nWrong input.\n");
+                    break;
+                }
+                printClasses(classList->head);
                 break;
-
             default:
                 break;
             }
             break;
         case 3:
             printf("\n\n\nRemove:\n1)Student\n2)Teacher\n3)Class\n");
-            subselect = getchar();
+            scanf("%d", &subselect);
+
             switch (subselect)
             {
             case 1:
@@ -276,8 +385,6 @@ int main()
                 printf("\nWrong input.\n");
                 break;
             }
-            break;
-
             break;
         case 4:
             printf("Register for the class.\nPrint your Student id as well as Class Id");
@@ -321,18 +428,18 @@ void loadStudent(StudList *studList)
     while (fgets(line, 100, fptr))
     {
         tok = strtok(line, delim);
-        int id;
+        char id[10];
         int count = 0;
         char name[20];
         char surname[20];
-        int limit;
-        int numberOfClasses;
+        char limit[10];
+        char numberOfClasses[10];
         while (tok != NULL)
         {
             switch (count)
             {
             case 0:
-                id = atoi(tok);
+                strcpy(id, tok);
                 count++;
                 break;
 
@@ -345,11 +452,11 @@ void loadStudent(StudList *studList)
                 count++;
                 break;
             case 3:
-                limit = atoi(tok);
+                strcpy(limit, tok);
                 count++;
                 break;
             case 4:
-                numberOfClasses = atoi(tok);
+                strcpy(numberOfClasses, tok);
                 count++;
                 break;
             default:
@@ -381,7 +488,7 @@ void loadTeachers(TeacherList *teacherList)
     while (fgets(line, 100, fptr))
     {
         tok = strtok(line, delim);
-        int id;
+        char char_id[10];
         int count = 0;
         char name[20];
         char surname[20];
@@ -391,7 +498,7 @@ void loadTeachers(TeacherList *teacherList)
             switch (count)
             {
             case 0:
-                id = atoi(tok);
+                strcpy(char_id, tok);
                 count++;
                 break;
 
@@ -412,7 +519,7 @@ void loadTeachers(TeacherList *teacherList)
             }
             tok = strtok(NULL, delim);
         }
-        (*addFunct[1])(teacherList, id, name, surname, title);
+        (*addFunct[1])(teacherList, char_id, name, surname, title);
     }
 }
 void loadClasses(ClassList *classList)
@@ -435,53 +542,58 @@ void loadClasses(ClassList *classList)
     while (fgets(line, 100, fptr))
     {
         tok = strtok(line, delim);
-        int id;
+        char id[20];
         int count = 0;
-        int credits;
-        int capacity;
-        int profId;
+        char credits[20];
+        char capacity[20];
+        char profId[20];
+        char name[20];
         while (tok != NULL)
         {
             switch (count)
             {
             case 0:
-                id = atoi(tok);
+                strcpy(id, tok);
                 count++;
                 break;
 
             case 1:
-                credits = atoi(tok);
+                strcpy(credits, tok);
                 count++;
                 break;
             case 2:
-                capacity = atoi(tok);
+                strcpy(capacity, tok);
                 count++;
                 break;
             case 3:
-                profId = atoi(tok);
+                strcpy(profId, tok);
                 count++;
                 break;
-            default:
+            case 4:
+                strcpy(name, tok);
+                count++;
                 break;
             }
             tok = strtok(NULL, delim);
         }
-        (*addFunct[2])(classList, id, credits, capacity, profId);
+        (*addFunct[2])(classList, id, credits, capacity, profId, name);
     }
 }
-void addStudent(StudList *studList, int *new_id, char *new_name, char *new_surname, int *new_limit, int *new_numOfClasses)
+void addStudent(StudList *studList, char *char_id, char *new_name, char *new_surname, char *char_limit, char *char_numOfClasses)
 {
     // basically, we add a new node in the beginning of the double linked list
     // allocate node
     StudentNode *new_student;
     new_student = (StudentNode *)malloc(sizeof(StudentNode));
+    int int_id = atoi(char_id);
 
-    // put id, name, surname, limit, numOfClasses
-    new_student->id = new_id;
+    new_student->id = int_id;
     strcpy(new_student->name, new_name);
     strcpy(new_student->surname, new_surname);
-    new_student->limit = new_limit;
-    new_student->numOfClasses = new_numOfClasses;
+    int int_limit = atoi(char_limit);
+    int int_numOfClasses = atoi(char_numOfClasses);
+    new_student->limit = int_limit;
+    new_student->numOfClasses = int_numOfClasses;
 
     new_student->next = studList->head;
     new_student->prev = NULL;
@@ -528,18 +640,19 @@ StudentNode *searchStudent(int *id, StudList *studList)
     }
     return current;
 }
-void updateStudent(int *id, StudList *studList, int *choice, char *dataToChange)
+void updateStudent(char *char_id, StudList *studList, char *char_choice, char *dataToChange)
 {
     // !TODO wrong choise for all updates
     StudentNode *studentToChange;
-    studentToChange = searchStudent(id, studList);
+    int int_id = atoi(char_id);
+    studentToChange = searchStudent(int_id, studList);
+    int choice = atoi(char_choice);
     if (studentToChange == NULL)
     {
         printf("Student not found");
         return NULL;
     }
-    int choise = choice;
-    switch (choise)
+    switch (choice)
     {
     case 1:
     {
@@ -552,21 +665,6 @@ void updateStudent(int *id, StudList *studList, int *choice, char *dataToChange)
     {
         strcpy(studentToChange->surname, dataToChange);
         printf("Surname changed.");
-        break;
-    }
-    case 3:
-    {
-        // make it int
-        dataToChange = atoi(dataToChange);
-        studentToChange->limit = dataToChange;
-        printf("Students limit changed.");
-        break;
-    }
-    case 4:
-    {
-        dataToChange = atoi(dataToChange);
-        studentToChange->numOfClasses = dataToChange;
-        printf("Number of classes changed.");
         break;
     }
     }
@@ -604,15 +702,15 @@ void deleteLastStudent(StudList *studList)
 
 // Teacher Section
 
-void addTeacher(TeacherList *teacherList, int *new_id, char *new_name, char *new_surname, char *new_title)
+void addTeacher(TeacherList *teacherList, char *char_id, char *new_name, char *new_surname, char *new_title)
 {
     // basically, we add a new node in the beginning of the double linked list
     // allocate node
     TeacherNode *new_teacher;
     new_teacher = (TeacherNode *)malloc(sizeof(TeacherNode));
-
+    int int_id = atoi(char_id);
     // put id, name, surname, limit, numOfClasses
-    new_teacher->id = new_id;
+    new_teacher->id = int_id;
     strcpy(new_teacher->name, new_name);
     strcpy(new_teacher->surname, new_surname);
     strcpy(new_teacher->title, new_title);
@@ -662,11 +760,13 @@ TeacherNode *searchTeacher(int *id, TeacherList *teacherList)
     }
     return current;
 }
-void updateTeacher(int *id, TeacherList *teacherList, int choise, char data)
+void updateTeacher(char *char_id, TeacherList *teacherList, char *char_choise, char *data)
 {
     TeacherNode *teacherToChange;
-    teacherToChange = searchTeacher(id, teacherList);
-    switch (choise)
+    int int_id = atoi(char_id);
+    int int_choise = atoi(char_choise);
+    teacherToChange = searchTeacher(int_id, teacherList);
+    switch (int_choise)
     {
         // name
     case 1:
@@ -713,16 +813,19 @@ void deleteLastTeacher(TeacherList *teacherList)
         teacherList->tail->next = NULL;
     }
 }
-void addClass(ClassList *classList, int *new_id, int *new_credits, int *new_capacity, int *new_profId)
+void addClass(ClassList *classList, char *char_id, char *char_credits, char *char_capacity, char *char_profId, char *name)
 {
     ClassNode *new_class;
     new_class = (ClassNode *)malloc(sizeof(ClassNode));
-
-    new_class->id = new_id;
-    new_class->credits = new_credits;
-    new_class->capacity = new_capacity;
-    new_class->profId = new_profId;
-
+    int int_id = atoi(char_id);
+    int int_credits = atoi(char_credits);
+    int int_capacity = atoi(char_capacity);
+    int int_profId = atoi(char_profId);
+    new_class->id = int_id;
+    new_class->credits = int_credits;
+    new_class->capacity = int_capacity;
+    new_class->profId = int_profId;
+    strcpy(new_class->name, name);
     new_class->next = classList->head;
     new_class->prev = NULL;
     if (classList->head)
@@ -749,7 +852,7 @@ void printClasses(ClassNode *classNode)
 }
 void printSingleClass(ClassNode *classNode)
 {
-    printf("ID:%d CREDITS:%d CAPACITY:%d PROFFESORS ID:%d \n", classNode->id, classNode->credits, classNode->capacity, classNode->profId);
+    printf("ID:%d CREDITS:%d CAPACITY:%d PROFFESORS ID:%d NAME:%s \n", classNode->id, classNode->credits, classNode->capacity, classNode->profId, classNode->name);
 }
 ClassNode *searchClass(int *id, ClassList *classList)
 {
@@ -765,23 +868,26 @@ ClassNode *searchClass(int *id, ClassList *classList)
     }
     return current;
 }
-void updateClass(int *id, ClassList *classList, int choise, int data)
+void updateClass(char *char_id, ClassList *classList, char *char_choise, char *char_data)
 {
+    int int_id = atoi(char_id);
+    int int_choise = atoi(char_choise);
+    int int_data = atoi(char_data);
     ClassNode *classToChange;
-    classToChange = searchClass(id, classList);
-    switch (choise)
+    classToChange = searchClass(int_id, classList);
+    switch (int_choise)
     {
     case 1:
-        classToChange->id = data;
+        classToChange->credits = int_data;
         break;
     case 2:
-        classToChange->credits = data;
+        classToChange->capacity = int_data;
         break;
     case 3:
-        classToChange->capacity = data;
+        classToChange->profId = int_data;
         break;
     case 4:
-        classToChange->profId = data;
+        strcpy(classToChange->name, char_data);
         break;
     }
 }
