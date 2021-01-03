@@ -5,7 +5,6 @@
 #include <time.h>
 #include <assert.h>
 // student
-// !TODO fix delete function variable types
 // !TODO Cases 4,5,6 list dumping for all the data
 typedef struct studentNode
 {
@@ -75,8 +74,7 @@ void printStudents(StudentNode *studentNode);
 void printSingleStudent(StudentNode *studentNode);
 StudentNode *searchStudent(int *id, StudList *studList);
 void updateStudent(char *id, StudList *studList, char *select, char *dataToChange);
-void deleteStudent(int *id, StudList *studList);
-void deleteLastStudent(StudList *studList);
+void deleteStudent(char *id, StudList *studList);
 void loadStudent();
 
 void addTeacher(TeacherList *teacherList, char *new_id, char *new_name, char *new_surname, char *new_title);
@@ -84,8 +82,7 @@ void printTeachers(TeacherNode *teacherNode);
 void printSingleTeacher(TeacherNode *teacherNode);
 TeacherNode *searchTeacher(int *id, TeacherList *teacherList);
 void updateTeacher(char *char_id, TeacherList *teacherList, char *char_choise, char *data);
-void deleteTeacher(int *id, TeacherList *teacherList);
-void deleteLastTeacher(TeacherList *teacherList);
+void deleteTeacher(char *id, TeacherList *teacherList);
 void loadTeachers();
 
 void addClass(ClassList *classList, char *char_id, char *char_credits, char *char_capacity, char *char_profId, char *name);
@@ -93,13 +90,15 @@ void printClasses(ClassNode *classNode);
 void printSingleClass(ClassNode *classNode);
 ClassNode *searchClass(int *id, ClassList *classList);
 void updateClass(char *char_id, ClassList *classList, char *char_choise, char *char_data);
-void deleteClass(int *id, ClassList *classList);
-void deleteLastClass(ClassList *classList);
-void addRelation(RelationList *relationList, int *new_studentId, int *new_classId, char *new_registDate, char *status);
+void deleteClass(char *id, ClassList *classList);
+void addRelation(RelationList *relationList, char *char_studentId, char *char_classId);
 RelationNode *searchRelation(int *id, RelationList *relationList);
 void updateRelationStatus(RelationList *relationList, int *id);
 void printRelations(RelationNode *relationNode);
 void printSingleRelation(RelationNode *relationNode);
+RelationNode *searchRelationByClassAndStudent(int *studId, int *classId, RelationList *relationList);
+RelationNode *searchRelationByStudent(int *studId, RelationList *relationList);
+RelationNode *searchRelationByClass(int *classId, RelationList *relationList);
 
 void (*addFunct[4])() = {addStudent, addTeacher, addClass, addRelation};
 void (*deleteFunct[3])() = {deleteStudent, deleteTeacher, deleteClass};
@@ -111,6 +110,8 @@ int main()
 {
     // !TODO function to dump the data
     //  !TODO create a main flow
+    int credLim = 20;
+    int classLimit = 5;
     StudList *studList;
     studList = (StudList *)malloc(sizeof(StudList));
     studList->head = NULL;
@@ -126,6 +127,11 @@ int main()
     classList->head = NULL;
     classList->tail = NULL;
 
+    RelationList *relationList;
+    relationList = (RelationList *)malloc(sizeof(RelationList));
+    relationList->head = NULL;
+    relationList->tail = NULL;
+
     loadStudent(studList);
     loadTeachers(teacherList);
     loadClasses(classList);
@@ -137,8 +143,8 @@ int main()
     while (exit != 1)
     {
         int iter = 0;
-        int select, subselect, subSubs, choice, data, new_id, new_prof_id;
-        char name[20], surname[20], title[20], info[20], empty, id[10], limit[10], numOfClasses[10], credits[10], capacity[20], subSubSelect[10], sub, prof_id[20];
+        int select, subselect, subSubs, choice, new_id, new_prof_id, sec_id;
+        char name[20], surname[20], title[20], info[20], empty, id[10], secId[10], limit[10], numOfClasses[10], credits[10], capacity[20], subSubSelect[10], sub, prof_id[20], data[20];
 
         printMenu();
         scanf("%d", &select);
@@ -359,24 +365,24 @@ int main()
         case 3:
             printf("\n\n\nRemove:\n1)Student\n2)Teacher\n3)Class\n");
             scanf("%d", &subselect);
-
+            scanf("%c", &empty);
             switch (subselect)
             {
             case 1:
                 printf("Enter id of a student to remove:\n");
-                scanf("%d", &data);
+                gets(data);
                 (*deleteFunct[0])(data, studList);
                 (*printAll[0])(studList->head);
                 break;
             case 2:
                 printf("Enter id of a teacher to remove:\n");
-                scanf("%d", &data);
+                gets(data);
                 (*deleteFunct[1])(data, teacherList);
                 (*printAll[1])(teacherList->head);
                 break;
             case 3:
                 printf("Enter id of a class to remove:\n");
-                scanf("%d", &data);
+                gets(data);
                 (*deleteFunct[2])(data, classList);
                 (*printAll[2])(classList->head);
                 break;
@@ -387,7 +393,47 @@ int main()
             }
             break;
         case 4:
-            printf("Register for the class.\nPrint your Student id as well as Class Id");
+            printf("Register for the class.\nPrint your Student id.\n");
+            gets(id);
+            new_id = atoi(id);
+            StudentNode *currentStud = searchStudent(new_id, studList);
+            while (currentStud == NULL)
+            {
+                printf("Student with this id doesn't exist, enter another id:\n");
+                gets(id);
+                new_id = atoi(id);
+                currentStud = searchStudent(new_id, studList);
+            }
+            printf("\nPrint Class id:\n");
+            gets(secId);
+            sec_id = atoi(secId);
+            ClassNode *currentClass = searchClass(sec_id, classList);
+            while (currentClass == NULL)
+            {
+                printf("Class with this id doesn't exist, enter another id:\n");
+                gets(secId);
+                sec_id = atoi(secId);
+                currentClass = searchClass(sec_id, classList);
+            }
+            RelationNode *currentRelation = searchRelationByClassAndStudent(new_id, sec_id, relationList);
+            if (currentRelation == NULL)
+            {
+                if (currentStud->numOfClasses < classLimit)
+                {
+                    if ((currentStud->limit + currentClass->credits) > credLim)
+                    {
+                        printf("Student not allowed to register\n");
+                        break;
+                    }
+                }
+                else
+                    break;
+                addRelation(relationList, new_id, sec_id);
+            }
+            else
+            {
+                updateRelationStatus(relationList, currentRelation->id);
+            }
             break;
         case 5:
             printf("List all the classes chosen by a student.\nPlease provide student id:\n");
@@ -669,13 +715,14 @@ void updateStudent(char *char_id, StudList *studList, char *char_choice, char *d
     }
     }
 }
-void deleteStudent(int *id, StudList *studList)
+void deleteStudent(char *id, StudList *studList)
 {
+    int int_id = atoi(id);
     StudentNode *nodeToDelete;
-    nodeToDelete = searchStudent(id, studList);
+    nodeToDelete = searchStudent(int_id, studList);
     if (nodeToDelete)
     {
-        if (studList->tail = nodeToDelete)
+        if (studList->tail == nodeToDelete)
             studList->tail = nodeToDelete->prev;
 
         if (nodeToDelete->prev)
@@ -684,20 +731,12 @@ void deleteStudent(int *id, StudList *studList)
         if (nodeToDelete->next)
             nodeToDelete->next->prev = nodeToDelete->prev;
 
+        if (studList->head == nodeToDelete)
+            studList->head = nodeToDelete->next;
         free(nodeToDelete);
+        return;
     }
-}
-void deleteLastStudent(StudList *studList)
-{
-    StudentNode *nodeToDelete;
-    if (studList && (studList->tail))
-    {
-        nodeToDelete = studList->tail;
-        studList->tail = nodeToDelete->prev;
-        studList->tail->next = NULL;
-        if (nodeToDelete)
-            free(nodeToDelete);
-    }
+    printf("\nItem not found.\n");
 }
 
 // Teacher Section
@@ -782,13 +821,14 @@ void updateTeacher(char *char_id, TeacherList *teacherList, char *char_choise, c
         break;
     }
 }
-void deleteTeacher(int *id, TeacherList *teacherList)
+void deleteTeacher(char *id, TeacherList *teacherList)
 {
+    int int_id = atoi(id);
     TeacherNode *nodeToDelete;
-    nodeToDelete = searchTeacher(id, teacherList);
+    nodeToDelete = searchTeacher(int_id, teacherList);
     if (nodeToDelete)
     {
-        if (teacherList->tail = nodeToDelete)
+        if (teacherList->tail == nodeToDelete)
             teacherList->tail = nodeToDelete->prev;
 
         if (nodeToDelete->prev)
@@ -796,23 +836,16 @@ void deleteTeacher(int *id, TeacherList *teacherList)
 
         if (nodeToDelete->next)
             nodeToDelete->next->prev = nodeToDelete->prev;
-
+        if (teacherList->head == nodeToDelete)
+            teacherList->head = nodeToDelete->next;
         free(nodeToDelete);
+        return;
     }
+    printf("\nItem not found.\n");
 }
 
 // Classes Section
 
-void deleteLastTeacher(TeacherList *teacherList)
-{
-    TeacherNode *nodeToDelete;
-    if (teacherList && (teacherList->tail))
-    {
-        nodeToDelete = teacherList->tail;
-        teacherList->tail = nodeToDelete->prev;
-        teacherList->tail->next = NULL;
-    }
-}
 void addClass(ClassList *classList, char *char_id, char *char_credits, char *char_capacity, char *char_profId, char *name)
 {
     ClassNode *new_class;
@@ -891,13 +924,14 @@ void updateClass(char *char_id, ClassList *classList, char *char_choise, char *c
         break;
     }
 }
-void deleteClass(int *id, ClassList *classList)
+void deleteClass(char *id, ClassList *classList)
 {
+    int int_id = atoi(id);
     ClassNode *nodeToDelete;
-    nodeToDelete = searchClass(id, classList);
+    nodeToDelete = searchClass(int_id, classList);
     if (nodeToDelete)
     {
-        if (classList->tail = nodeToDelete)
+        if (classList->tail == nodeToDelete)
             classList->tail = nodeToDelete->prev;
 
         if (nodeToDelete->prev)
@@ -906,37 +940,37 @@ void deleteClass(int *id, ClassList *classList)
         if (nodeToDelete->next)
             nodeToDelete->next->prev = nodeToDelete->prev;
 
+        if (classList->head == nodeToDelete)
+            classList->head = nodeToDelete->next;
         free(nodeToDelete);
+        return;
     }
-}
-void deleteLastClass(ClassList *classList)
-{
-    ClassNode *nodeToDelete;
-    if (classList && (classList->tail))
-    {
-        nodeToDelete = classList->tail;
-        classList->tail = nodeToDelete->prev;
-        classList->tail->next = NULL;
-    }
+    printf("\nItem not found.\n");
 }
 
 // Relations Section
 
-void addRelation(RelationList *relationList, int *new_studentId, int *new_classId, char *new_registDate, char *status)
+void addRelation(RelationList *relationList, char *char_studentId, char *char_classId)
 {
+    int int_studentId = atoi(char_studentId);
+    int int_classId = atoi(char_classId);
 
     RelationNode *new_relation;
     new_relation = (RelationNode *)malloc(sizeof(RelationNode));
     // Counter stays for amount of all relations, so we can give them id's starting from 1.
+
     (relationList->counter)++;
-    int new_relationID = relationList->counter;
-    new_relation->id = new_relationID;
+    new_relation->id = relationList->counter;
+
     char stat = "Registered";
-    strcpy(new_relation->status, stat);
     new_relation->id = relationList->counter;
     time_t now = time(NULL);
     struct tm *tm = localtime(&now);
     assert(strftime(new_relation->registDate, sizeof(new_relation->registDate), "%c", now));
+
+    new_relation->classId = int_classId;
+    new_relation->studentId = int_studentId;
+    strcpy(new_relation->status, stat);
     new_relation->next = relationList->head;
     new_relation->prev = NULL;
     if (relationList->head)
@@ -947,17 +981,47 @@ void addRelation(RelationList *relationList, int *new_studentId, int *new_classI
     {
         relationList->tail = new_relation;
     }
+    // make new node as a head
     relationList->head = new_relation;
 }
-RelationNode *searchRelation(int *id, RelationList *relationList)
+RelationNode *searchRelationByClass(int *classId, RelationList *relationList)
 {
     RelationNode *current;
     current = relationList->head;
     while (current)
     {
-        if (id == current->id)
+        if (classId == current->classId)
         {
             return current;
+        }
+        current = current->next;
+    }
+    return current;
+}
+RelationNode *searchRelationByStudent(int *studId, RelationList *relationList)
+{
+    RelationNode *current;
+    current = relationList->head;
+    while (current)
+    {
+        if (studId == current->studentId)
+        {
+            return current;
+        }
+        current = current->next;
+    }
+    return current;
+}
+RelationNode *searchRelationByClassAndStudent(int *studId, int *classId, RelationList *relationList)
+{
+    RelationNode *current;
+    current = relationList->head;
+    while (current)
+    {
+        if (current->studentId == studId)
+        {
+            if (current->classId == classId)
+                return current;
         }
         current = current->next;
     }
