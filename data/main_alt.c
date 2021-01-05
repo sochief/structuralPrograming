@@ -54,11 +54,11 @@ typedef struct classList
 // !TODO check if the id is not used, if it is, ask for the other one
 typedef struct relationNode
 {
-    char status[20];
+    char status[15];
     int id;
     int studentId;
     int classId;
-    char registDate[64];
+    char registDate[30];
     struct relationNode *next;
     struct relationNode *prev;
 } RelationNode;
@@ -75,7 +75,9 @@ void printSingleStudent(StudentNode *studentNode);
 StudentNode *searchStudent(int *id, StudList *studList);
 void updateStudent(char *id, StudList *studList, char *select, char *dataToChange);
 void deleteStudent(char *id, StudList *studList);
-void loadStudent();
+void listStudClasses(char *id, RelationList *relationList, ClassList *classList);
+void loadStudent(StudList *studList);
+void dumpStudent(StudList *studList);
 
 void addTeacher(TeacherList *teacherList, char *new_id, char *new_name, char *new_surname, char *new_title);
 void printTeachers(TeacherNode *teacherNode);
@@ -83,7 +85,9 @@ void printSingleTeacher(TeacherNode *teacherNode);
 TeacherNode *searchTeacher(int *id, TeacherList *teacherList);
 void updateTeacher(char *char_id, TeacherList *teacherList, char *char_choise, char *data);
 void deleteTeacher(char *id, TeacherList *teacherList);
-void loadTeachers();
+void listTeacherClasses(char *id, ClassList *classlist);
+void loadTeachers(TeacherList *teacherList);
+void dumpTeachers(TeacherList *teacherList);
 
 void addClass(ClassList *classList, char *char_id, char *char_credits, char *char_capacity, char *char_profId, char *name);
 void printClasses(ClassNode *classNode);
@@ -99,6 +103,8 @@ void printSingleRelation(RelationNode *relationNode);
 RelationNode *searchRelationByClassAndStudent(int *studId, int *classId, RelationList *relationList);
 RelationNode *searchRelationByStudent(int *studId, RelationList *relationList);
 RelationNode *searchRelationByClass(int *classId, RelationList *relationList);
+void loadClasses(ClassList *classList);
+void dumpClassList(ClassList *classList, RelationList *relationList, StudList *studList);
 
 void (*addFunct[4])() = {addStudent, addTeacher, addClass, addRelation};
 void (*deleteFunct[3])() = {deleteStudent, deleteTeacher, deleteClass};
@@ -109,9 +115,9 @@ void (*printAll[4])() = {printStudents, printTeachers, printClasses, printRelati
 int main()
 {
     // !TODO function to dump the data
-    //  !TODO create a main flow
-    int credLim = 20;
-    int classLimit = 5;
+    // !TODO create a main flow
+    int credLim = 100;
+    int classLimit = 100;
     StudList *studList;
     studList = (StudList *)malloc(sizeof(StudList));
     studList->head = NULL;
@@ -131,6 +137,7 @@ int main()
     relationList = (RelationList *)malloc(sizeof(RelationList));
     relationList->head = NULL;
     relationList->tail = NULL;
+    relationList->counter = 0;
 
     loadStudent(studList);
     loadTeachers(teacherList);
@@ -138,6 +145,10 @@ int main()
     (*printAll[0])(studList->head);
     (*printAll[1])(teacherList->head);
     (printAll[2])(classList->head);
+    StudentNode *currentStud;
+    RelationNode *currentRelation;
+    ClassNode *currentClass;
+    TeacherNode *currentTeacher;
     int exit = 0;
     printf("---------------Welcome to the system---------------");
     while (exit != 1)
@@ -148,6 +159,7 @@ int main()
 
         printMenu();
         scanf("%d", &select);
+        scanf("%c", &empty);
         switch (select)
         {
         case 1:
@@ -396,7 +408,7 @@ int main()
             printf("Register for the class.\nPrint your Student id.\n");
             gets(id);
             new_id = atoi(id);
-            StudentNode *currentStud = searchStudent(new_id, studList);
+            currentStud = searchStudent(new_id, studList);
             while (currentStud == NULL)
             {
                 printf("Student with this id doesn't exist, enter another id:\n");
@@ -404,10 +416,10 @@ int main()
                 new_id = atoi(id);
                 currentStud = searchStudent(new_id, studList);
             }
-            printf("\nPrint Class id:\n");
+            printf("Print Class id:\n");
             gets(secId);
             sec_id = atoi(secId);
-            ClassNode *currentClass = searchClass(sec_id, classList);
+            currentClass = searchClass(sec_id, classList);
             while (currentClass == NULL)
             {
                 printf("Class with this id doesn't exist, enter another id:\n");
@@ -415,7 +427,7 @@ int main()
                 sec_id = atoi(secId);
                 currentClass = searchClass(sec_id, classList);
             }
-            RelationNode *currentRelation = searchRelationByClassAndStudent(new_id, sec_id, relationList);
+            currentRelation = searchRelationByClassAndStudent(new_id, sec_id, relationList);
             if (currentRelation == NULL)
             {
                 if (currentStud->numOfClasses < classLimit)
@@ -427,20 +439,83 @@ int main()
                     }
                 }
                 else
+                {
+                    printf("Student not allowed to register\n");
                     break;
-                addRelation(relationList, new_id, sec_id);
+                }
+                printf("Adding\n");
+                addRelation(relationList, id, secId);
+                (*printAll[3])(relationList->head);
+                currentStud->limit += currentClass->credits;
+                currentStud->numOfClasses++;
             }
             else
             {
+                printf("Updating Registration status\n");
                 updateRelationStatus(relationList, currentRelation->id);
             }
             break;
         case 5:
             printf("List all the classes chosen by a student.\nPlease provide student id:\n");
+            gets(id);
+            new_id = atoi(id);
+            currentStud = searchStudent(new_id, studList);
+            while (currentStud == NULL)
+            {
+                printf("Student with this id doesn't exist, enter another id:\n");
+                gets(id);
+                new_id = atoi(id);
+                currentStud = searchStudent(new_id, studList);
+            }
+            printf("Selected student's entry:\n");
+            printSingleStudent(currentStud);
+            printf("\nRegistered classes:\n");
+            listStudClasses(id, relationList, classList);
             break;
         case 6:
-            printf("To save all student, who took the class, please provide the Id of the class.\n");
+            printf("To list all students, who took the class, please provide the Id of the class.\n");
+            gets(id);
+            new_id = atoi(id);
+            currentClass = searchClass(new_id, classList);
+            while (currentClass == NULL)
+            {
+                printf("Class with this id doesn't exist, enter another id:\n");
+                gets(id);
+                new_id = atoi(id);
+                currentClass = searchClass(new_id, classList);
+            }
+            printf("Selected Class:\n");
+            printSingleClass(currentClass);
+            printf("Registered Students list is being prepared");
+            listClassStuds(id, relationList, studList);
+            printf("The %d_ClassList.txt file is ready", new_id);
             break;
+        case 7:
+            printf("To list all classes given by a teacher, please provide the Id of the teacher:\n");
+            gets(id);
+            new_id = atoi(id);
+            currentTeacher = searchTeacher(new_id, teacherList);
+            while (currentTeacher == NULL)
+            {
+                printf("Professor with this id doesn't exist, enter another id:\n");
+                gets(id);
+                new_id = atoi(id);
+                currentTeacher = searchTeacher(new_id, teacherList);
+            }
+            printf("Selected Teacher:\n");
+            printSingleTeacher(currentTeacher);
+            printf("Classes given by the teacher:\n");
+            listTeacherClasses(id, classList);
+        case 8:
+            printf("Outputting entries to text files...");
+            dumpStudent(studList);
+            dumpTeacher(teacherList);
+            dumpClass(classList);
+            dumpClassList(classList, relationList, studList);
+        case 9:
+            printf("Exiting...");
+            exit = 1;
+
         default:
             printf("Wrong input.");
             break;
@@ -451,7 +526,7 @@ int main()
 }
 void printMenu()
 {
-    printf("Choose your operation:\n1)Add student/teacher/class\n2)Update student/teacher/class\n3)Delete student/teacher/class\n4)Register/Cancel for a class\n5)Print all courses taken by student\n6)Load to the txt all student, who took certain class\n");
+    printf("Choose your operation:\n1)Add student/teacher/class\n2)Update student/teacher/class\n3)Delete student/teacher/class\n4)Register/Cancel for a class\n5)Print all courses taken by student\n6)Load to the txt all student, who took certain class\n7)List Classes given by a teacher\n8)Dump data\n9)Exit\n");
 }
 
 void loadStudent(StudList *studList)
@@ -952,27 +1027,23 @@ void deleteClass(char *id, ClassList *classList)
 
 void addRelation(RelationList *relationList, char *char_studentId, char *char_classId)
 {
+    time_t t;
+    time(&t);
     int int_studentId = atoi(char_studentId);
     int int_classId = atoi(char_classId);
-
     RelationNode *new_relation;
     new_relation = (RelationNode *)malloc(sizeof(RelationNode));
     // Counter stays for amount of all relations, so we can give them id's starting from 1.
-
+    strcpy(new_relation->registDate, ctime(&t));
     (relationList->counter)++;
     new_relation->id = relationList->counter;
-
-    char stat = "Registered";
+    char stat[15] = "Registered";
     new_relation->id = relationList->counter;
-    time_t now = time(NULL);
-    struct tm *tm = localtime(&now);
-    assert(strftime(new_relation->registDate, sizeof(new_relation->registDate), "%c", now));
-
     new_relation->classId = int_classId;
     new_relation->studentId = int_studentId;
     strcpy(new_relation->status, stat);
-    new_relation->next = relationList->head;
     new_relation->prev = NULL;
+    new_relation->next = relationList->head;
     if (relationList->head)
     {
         relationList->head->prev = new_relation;
@@ -983,6 +1054,20 @@ void addRelation(RelationList *relationList, char *char_studentId, char *char_cl
     }
     // make new node as a head
     relationList->head = new_relation;
+}
+RelationNode *searchRelation(int *id, RelationList *relationList)
+{
+    RelationNode *current;
+    current = relationList->head;
+    while (current)
+    {
+        if (id == current->id)
+        {
+            return current;
+        }
+        current = current->next;
+    }
+    return current;
 }
 RelationNode *searchRelationByClass(int *classId, RelationList *relationList)
 {
@@ -1031,20 +1116,20 @@ void updateRelationStatus(RelationList *relationList, int *id)
 {
     RelationNode *relationToUpdate;
     relationToUpdate = searchRelation(id, relationList);
-    if (strcmp(relationToUpdate->status, "Registered"))
+    if (!(strcmp(relationToUpdate->status, "Registered")))
     {
         strcpy(relationToUpdate->status, "Cancelled");
-        time_t now = time(NULL);
-        struct tm *tm = localtime(&now);
-        assert(strftime(relationToUpdate->registDate, sizeof(relationToUpdate->registDate), "%c", now));
+        time_t t;
+        time(&t);
+        strcpy(relationToUpdate->registDate, ctime(&t));
         printf("Changed status to Cancelled");
     }
     else
     {
         strcpy(relationToUpdate->status, "Registered");
-        time_t now = time(NULL);
-        struct tm *tm = localtime(&now);
-        assert(strftime(relationToUpdate->registDate, sizeof(relationToUpdate->registDate), "%c", now));
+        time_t t;
+        time(&t);
+        strcpy(relationToUpdate->registDate, ctime(&t));
         printf("Changed status to Applied");
     }
 }
@@ -1063,5 +1148,121 @@ void printRelations(RelationNode *relationNode)
 }
 void printSingleRelation(RelationNode *relationNode)
 {
-    printf("CLASS ID:%d    STUDENT ID:%d    RELATION ID:%d    STATUS:%s    REGISTRATION DATE:%c\n", relationNode->id, relationNode->studentId, relationNode->status, relationNode->registDate);
+    printf("CLASS ID:%d    STUDENT ID:%d    RELATION ID:%d    STATUS:%s    REGISTRATION DATE:%s \n", relationNode->classId, relationNode->studentId, relationNode->id, relationNode->status, relationNode->registDate);
+}
+void listStudClasses(char *id, RelationList *relationList, ClassList *classList)
+{
+    int studId = atoi(id);
+    RelationNode *current;
+    current = relationList->head;
+    while (current)
+    {
+        if (studId == current->studentId)
+        {
+            printSingleClass(searchClass(current->classId, classList));
+            printf("Current Status: %s\n", current->status);
+        }
+        current = current->next;
+    }
+}
+void listClassStuds(char *id, RelationList *relationList, StudList *studList)
+{
+    FILE *fp;
+    char buffer[60];
+    char fileName[20];
+    char *tmp;
+    tmp = strcat(id, "_classList.txt");
+    strcpy(fileName, tmp);
+    fp = fopen(fileName, "w");
+    if (fp == NULL)
+    {
+        printf("Could not create file");
+        return;
+    }
+    int int_id = atoi(id);
+    RelationNode *current;
+    StudentNode *currentStud;
+    current = relationList->head;
+    while (current)
+    {
+        if (current->classId == int_id)
+        {
+            currentStud = searchStudent(current->studentId, studList);
+            sprintf(buffer, "%d %s %s\n", currentStud->id, currentStud->name, currentStud->surname);
+            fputs(buffer, fp);
+            //    fprintf(fp, "%d %s %s", currentStud->id, currentStud->name, currentStud->surname);
+        }
+        current = current->next;
+    }
+}
+void listTeacherClasses(char *id, ClassList *classList)
+{
+    int int_id = atoi(id);
+    ClassNode *current = classList->head;
+    while (current)
+    {
+        if (current->profId == int_id)
+        {
+            printSingleClass(current);
+        }
+        current = current->next;
+    }
+}
+void dumpStudent(StudList *studList)
+{
+    FILE *fp;
+    fp = fopen("./data/stdList.txt", "w");
+    if (fp == NULL)
+    {
+        printf("Error Creating stdList.txt");
+        return;
+    }
+    StudentNode *current = studList->head;
+    while (current != NULL)
+    {
+        fprintf("%d/%s/%s/%d/%d\n", current->id, current->name, current->surname, current->limit, current->numOfClasses);
+        current = current->next;
+    }
+}
+void dumpTeacher(TeacherList *teacherList)
+{
+    FILE *fp;
+    fp = fopen("./data/profList.txt", "w");
+    if (fp == NULL)
+    {
+        printf("Error Creating profList.txt");
+        return;
+    }
+    TeacherNode *current = teacherList->head;
+    while (current != NULL)
+    {
+        fprintf("%d/%s/%s/%s\n", current->id, current->name, current->surname, current->title);
+        current = current->next;
+    }
+}
+void dumpClass(ClassList *classList)
+{
+    FILE *fp;
+    fp = fopen("./data/classList.txt", "w");
+    if (fp == NULL)
+    {
+        printf("Error Creating stdList.txt");
+        return;
+    }
+    ClassNode *current = classList->head;
+    while (current)
+    {
+        fprintf("%d/%d/%d/%d/%s", current->id, current->credits, current->capacity, current->profId, current->name);
+        current = current->next;
+    }
+}
+void dumpClassList(ClassList *classList, RelationList *relationList, StudList *studList)
+{
+    ClassNode *current;
+    current = classList->head;
+    while (current)
+    {
+        listClassStuds(current->id, relationList, studList);
+        current = current->next;
+    }
 }
